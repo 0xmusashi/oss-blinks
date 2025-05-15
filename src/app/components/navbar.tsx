@@ -10,17 +10,19 @@ export function Navbar() {
 
   return (
     <nav className="w-full px-4 py-3 flex justify-between items-center relative">
-      {/* Dialect Logo */}
+      {/* OSS Logo */}
       <Link
-        href="https://www.dialect.to/"
-        className="flex items-center h-[30px] w-[250px]"
+        href="https://github.com/0xNetero/oss-blinks/"
+        className="flex items-center h-[40px]"
+        target="_blank"
       >
         <Image
-          src="/dialect-solana-logo.png"
-          alt="Dialect Logo"
-          width={250}
-          height={30}
-          className="object-contain"
+          src="/oss-logo.png"
+          alt="OSS Blinks Logo"
+          width={360}
+          height={80}
+          className="object-contain h-full w-auto"
+          priority
         />
       </Link>
 

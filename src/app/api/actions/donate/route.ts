@@ -186,7 +186,7 @@ export const POST = async (req: Request) => {
     const payload: ActionPostResponse = await createPostResponse({
       fields: {
         transaction,
-        message: `Donated ${amount} USDC to ${toPubkey.toBase58()}`,
+        message: `Donated ${amount} OSSBLINKS to ${toPubkey.toBase58()}`,
         type: 'transaction'
       },
       // note: no additional signers are needed

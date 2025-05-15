@@ -119,7 +119,7 @@ export default function Home() {
       <div className="flex flex-col items-center justify-center lg:border rounded-[10px] m-4 p-6">
         <br />
         {isLoading || !blink ? (
-          <span>Loading</span>
+          <span>Create your Blink using the form</span>
         ) : (
           <div className="w-full max-w-lg">
             <Blink
