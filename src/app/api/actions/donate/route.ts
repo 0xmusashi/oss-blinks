@@ -8,7 +8,6 @@ import {
 } from "@solana/actions";
 
 import {
-  clusterApiUrl,
   Connection,
   PublicKey,
   LAMPORTS_PER_SOL,
