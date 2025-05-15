@@ -48,7 +48,7 @@ export const OPTIONS = async () => {
 export const GET = async (req: Request) => {
     try {
         const requestUrl = new URL(req.url);
-        const { toPubkey, repo, repoName, avatarUrl } = await validatedQueryParams(requestUrl);
+        const { toPubkey, repo, repoName, avatarUrl, description } = await validatedQueryParams(requestUrl);
 
         const baseHref = new URL(
             `/api/actions/donate?to=${toPubkey.toBase58()}&repo=${repo}`,
@@ -59,8 +59,7 @@ export const GET = async (req: Request) => {
             type: 'action',
             title: `Donate USDC to ${repoName}`,
             icon: avatarUrl,
-            description:
-                'Cybersecurity Enthusiast | Support my research with a donation.',
+            description: description,
             label: 'Donate', // this value will be ignored since `links.actions` exists
             links: {
                 actions: [
@@ -240,7 +239,7 @@ const prepareTransaction = async (
     return new VersionedTransaction(message);
 };
 
-const extractAvatar = async (repoUrl: string) => {
+const extractRepoDetails = async (repoUrl: string) => {
     try {
         const trimmedUrl = repoUrl.trim();
         if (!trimmedUrl.startsWith('https://github.com/')) {
@@ -254,17 +253,20 @@ const extractAvatar = async (repoUrl: string) => {
         const owner = urlParts[0];
         const repoName = urlParts[0] + '/' + urlParts[1];
 
-        const userResponse = await axios.get(`https://api.github.com/users/${owner}`);
-        const avatarUrl = userResponse.data.avatar_url;
+        const repoResponse = await axios.get(`https://api.github.com/repos/${owner}/${urlParts[1]}`);
+        const avatarUrl = repoResponse.data.owner.avatar_url;
+        const description = repoResponse.data.description;
 
         return {
             avatarUrl,
             repoName,
+            description,
         };
     } catch (e: any) {
         return {
             avatarUrl: '',
             repoName: '',
+            description: '',
         }; // Return empty string on error to avoid further issues.
     }
 }
@@ -277,6 +279,7 @@ const validatedQueryParams = async (requestUrl: URL) => {
     let repo: string = 'https://github.com/0xnetero/git-blinks';
     let repoName: string = '0xNetero/git-blinks';
     let avatarUrl: string = 'https://avatars.githubusercontent.com/u/203130627?v=4';
+    let description: string = '';
 
     try {
         if (requestUrl.searchParams.get('to')) {
@@ -299,9 +302,10 @@ const validatedQueryParams = async (requestUrl: URL) => {
     try {
         if (requestUrl.searchParams.get('repo')) {
             repo = requestUrl.searchParams.get('repo')!;
-            const extractedData = await extractAvatar(repo);
+            const extractedData = await extractRepoDetails(repo);
             avatarUrl = extractedData.avatarUrl;
             repoName = extractedData.repoName;
+            description = extractedData.description;
         }
 
     } catch (err) {
@@ -313,6 +317,49 @@ const validatedQueryParams = async (requestUrl: URL) => {
         toPubkey,
         repo,
         repoName,
+        description,
         avatarUrl,
     };
+}
+
+/**
+ * Checks if the input is a valid EVM (Ethereum) address.
+ * Valid EVM addresses:
+ * - Start with "0x"
+ * - Are 42 characters long (including "0x")
+ * - Contain only hexadecimal characters after "0x" prefix
+ * 
+ * @param address - The wallet address string to check
+ * @returns boolean - True if it's a valid EVM address
+ */
+function isEVMAddress(address: string): boolean {
+    // Check if address starts with "0x" and is 42 characters long
+    if (!address.startsWith("0x") || address.length !== 42) {
+        return false;
+    }
+
+    // Check if all characters after "0x" are valid hex characters
+    const hexPart = address.slice(2);
+    const hexRegex = /^[0-9a-fA-F]+$/;
+    return hexRegex.test(hexPart);
+}
+
+/**
+ * Checks if the input is a valid Solana address.
+ * Valid Solana addresses:
+ * - Are 32-44 characters long
+ * - Contain only Base58 characters (A-Z, a-z, 0-9, excluding 0, O, I, l)
+ * 
+ * @param address - The wallet address string to check
+ * @returns boolean - True if it's a valid Solana address
+ */
+function isSolanaAddress(address: string): boolean {
+    // Typical Solana addresses are 32-44 characters long
+    if (address.length < 32 || address.length > 44) {
+        return false;
+    }
+
+    // Base58 character set (excludes characters: 0, O, I, l)
+    const base58Regex = /^[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]+$/;
+    return base58Regex.test(address);
 }
