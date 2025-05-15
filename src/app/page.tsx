@@ -24,11 +24,11 @@ export default function Home() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Update the blinkApiUrl with query parameters
-    const updatedUrl = `${window.location.origin}/api/actions/donate?to=${encodeURIComponent(walletAddress)}&repo=${encodeURIComponent(githubRepo)}`;
+    const updatedUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/api/actions/donate?to=${encodeURIComponent(walletAddress)}&repo=${encodeURIComponent(githubRepo)}`;
     setBlinkApiUrl(updatedUrl);
     setShareUrl(
       'https://dial.to/?action=solana-action%3A'
-      + encodeURIComponent(`${window.location.origin}/api/actions/donate?to=`)
+      + encodeURIComponent(`${process.env.NEXT_PUBLIC_BASE_URL}/api/actions/donate?to=`)
       + encodeURIComponent(walletAddress + '&repo=')
       + encodeURIComponent(githubRepo)
       + '&cluster=devnet'
