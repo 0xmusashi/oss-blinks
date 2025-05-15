@@ -9,7 +9,7 @@ export default function Home() {
   const [walletAddress, setWalletAddress] = useState("");
   const [githubRepo, setGithubRepo] = useState("");
   // should update to the production url later
-  const [blinkApiUrl, setBlinkApiUrl] = useState(`http://localhost:3000/api/actions/donate`);
+  const [blinkApiUrl, setBlinkApiUrl] = useState(`${window.location.origin}/api/actions/donate`);
   const [shareUrl, setShareUrl] = useState("");
   const [isCopied, setIsCopied] = useState(false);
 
