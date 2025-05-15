@@ -10,10 +10,6 @@ import {
 import {
   Connection,
   PublicKey,
-  LAMPORTS_PER_SOL,
-  SystemProgram,
-  TransactionMessage,
-  VersionedTransaction,
   Transaction,
 } from "@solana/web3.js";
 
@@ -209,33 +205,6 @@ export const POST = async (req: Request) => {
       headers,
     });
   }
-};
-
-const prepareTransaction = async (
-  connection: Connection,
-  payer: PublicKey,
-  receiver: PublicKey,
-  amount: number
-) => {
-  // Create a transfer instruction
-  const instruction = SystemProgram.transfer({
-    fromPubkey: payer,
-    toPubkey: new PublicKey(receiver),
-    lamports: amount * LAMPORTS_PER_SOL,
-  });
-
-  // Get the latest blockhash
-  const { blockhash } = await connection.getLatestBlockhash();
-
-  // Create a transaction message
-  const message = new TransactionMessage({
-    payerKey: payer,
-    recentBlockhash: blockhash,
-    instructions: [instruction],
-  }).compileToV0Message();
-
-  // Create and return a versioned transaction
-  return new VersionedTransaction(message);
 };
 
 const extractRepoDetails = async (repoUrl: string) => {
