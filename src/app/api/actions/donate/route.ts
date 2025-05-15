@@ -276,8 +276,7 @@ const validatedQueryParams = async (requestUrl: URL) => {
     '2grKcZPjxKbNKkc8S6nmrSXtXTXJih4utVMa7jBwRcFf',
   );
   let amount: number = 10;
-  let repo: string = 'https://github.com/0xnetero/git-blinks';
-  let repoName: string = '0xNetero/git-blinks';
+  let repo: string = 'https://github.com/0xnetero/oss-blinks';
   let avatarUrl: string = 'https://avatars.githubusercontent.com/u/203130627?v=4';
   let description: string = '';
 
