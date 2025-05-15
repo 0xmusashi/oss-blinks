@@ -8,7 +8,10 @@ import { useState } from "react";
 export default function Home() {
   const [walletAddress, setWalletAddress] = useState("");
   const [githubRepo, setGithubRepo] = useState("");
-  const [blinkApiUrl, setBlinkApiUrl] = useState("http://localhost:3000/api/actions/donate");
+  // should update to the production url later
+  const [blinkApiUrl, setBlinkApiUrl] = useState(`http://localhost:3000/api/actions/donate`);
+  const [shareUrl, setShareUrl] = useState("");
+  const [isCopied, setIsCopied] = useState(false);
 
   // Adapter, used to connect to the wallet
   const { adapter } = useBlinkSolanaWalletAdapter(
@@ -23,6 +26,26 @@ export default function Home() {
     // Update the blinkApiUrl with query parameters
     const updatedUrl = `${window.location.origin}/api/actions/donate?to=${encodeURIComponent(walletAddress)}&repo=${encodeURIComponent(githubRepo)}`;
     setBlinkApiUrl(updatedUrl);
+    setShareUrl(
+      'https://dial.to/?action=solana-action%3A'
+      + encodeURIComponent(`${window.location.origin}/api/actions/donate?to=`)
+      + encodeURIComponent(walletAddress + '&repo=')
+      + encodeURIComponent(githubRepo)
+    );
+  };
+
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setIsCopied(true);
+
+      // Reset the "Copied!" message after 2 seconds
+      setTimeout(() => {
+        setIsCopied(false);
+      }, 2000);
+    } catch (err) {
+      console.error('Failed to copy text: ', err);
+    }
   };
 
   return (
@@ -71,6 +94,25 @@ export default function Home() {
             Create Blink
           </button>
         </form>
+        {shareUrl && (
+          <div className="mt-4">
+            <p className="text-sm text-gray-600 mb-2">Share your Blink URL:</p>
+            <div className="flex">
+              <input
+                type="text"
+                value={shareUrl}
+                readOnly
+                className="flex-1 px-4 py-3 border border-gray-300 text-gray-900 bg-white rounded-l-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              />
+              <button
+                onClick={copyToClipboard}
+                className={`px-4 py-3 ${isCopied ? 'bg-green-600' : 'bg-indigo-600'} text-white rounded-r-md transition duration-200 hover:${isCopied ? 'bg-green-700' : 'bg-indigo-700'} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
+              >
+                {isCopied ? 'Copied!' : 'Copy'}
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="flex flex-col items-center justify-center lg:border rounded-[10px] m-4 p-6">

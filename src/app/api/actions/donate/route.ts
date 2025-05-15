@@ -59,7 +59,7 @@ export const GET = async (req: Request) => {
       type: 'action',
       title: `Donate OSSBLINKS to ${repo}`,
       icon: avatarUrl,
-      description: description,
+      description: description ? `Repo description: ${description}` : '',
       label: 'Donate', // this value will be ignored since `links.actions` exists
       links: {
         actions: [
