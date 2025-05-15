@@ -9,7 +9,7 @@ export default function Home() {
   const [walletAddress, setWalletAddress] = useState("");
   const [githubRepo, setGithubRepo] = useState("");
   // should update to the production url later
-  const [blinkApiUrl, setBlinkApiUrl] = useState(`https://oss-blinks.vercel.app/api/actions/donate`);
+  const [blinkApiUrl, setBlinkApiUrl] = useState(`${process.env.NEXT_PUBLIC_BASE_URL}/api/actions/donate`);
   const [shareUrl, setShareUrl] = useState("");
   const [isCopied, setIsCopied] = useState(false);
 
@@ -31,6 +31,7 @@ export default function Home() {
       + encodeURIComponent(`${window.location.origin}/api/actions/donate?to=`)
       + encodeURIComponent(walletAddress + '&repo=')
       + encodeURIComponent(githubRepo)
+      + '&cluster=devnet'
     );
   };
 
