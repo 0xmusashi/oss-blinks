@@ -1,103 +1,93 @@
-import Image from "next/image";
+"use client";
+
+import { Blink, useBlink } from "@dialectlabs/blinks";
+import { useBlinkSolanaWalletAdapter } from "@dialectlabs/blinks/hooks/solana";
+import "@dialectlabs/blinks/index.css";
+import { useState } from "react";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [walletAddress, setWalletAddress] = useState("");
+  const [githubRepo, setGithubRepo] = useState("");
+  const [blinkApiUrl, setBlinkApiUrl] = useState("http://localhost:3000/api/actions/donate");
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+  // Adapter, used to connect to the wallet
+  const { adapter } = useBlinkSolanaWalletAdapter(
+    "https://api.devnet.solana.com"
+  );
+
+  // Blink we want to execute
+  const { blink, isLoading } = useBlink({ url: blinkApiUrl });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Update the blinkApiUrl with query parameters
+    const updatedUrl = `${window.location.origin}/api/actions/donate?to=${encodeURIComponent(walletAddress)}&repo=${encodeURIComponent(githubRepo)}`;
+    setBlinkApiUrl(updatedUrl);
+  };
+
+  return (
+    <main className="grid grid-cols-1 lg:grid-cols-[2fr_3fr] min-h-[calc(100vh-64px)]">
+      <div className="col-span-1 p-4 lg:p-8 lg:pr-16 flex flex-col justify-center">
+        <h1 className="text-[32px] lg:text-[40px] mb-3 font-bold leading-[1]">
+          OSS Blinks
+        </h1>
+        <h2 className="text-[16px] lg:text-[18px] mb-2">Donate to public good OSS repos with Wormhole NTT</h2>
+
+        <form onSubmit={handleSubmit} className="mt-6 space-y-6 bg-gray-50 p-6 rounded-lg shadow-sm">
+          <div>
+            <label htmlFor="walletAddress" className="block text-sm font-medium text-gray-700 mb-2">
+              Wallet Address
+            </label>
+            <input
+              type="text"
+              id="walletAddress"
+              value={walletAddress}
+              onChange={(e) => setWalletAddress(e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 text-gray-900 bg-white rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="Enter Solana wallet address"
+              required
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+          </div>
+
+          <div>
+            <label htmlFor="githubRepo" className="block text-sm font-medium text-gray-700 mb-2">
+              GitHub Repository URL
+            </label>
+            <input
+              type="url"
+              id="githubRepo"
+              value={githubRepo}
+              onChange={(e) => setGithubRepo(e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 text-gray-900 bg-white rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="https://github.com/username/repo"
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-indigo-600 text-white py-3 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition font-medium text-sm"
           >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+            Create Blink
+          </button>
+        </form>
+      </div>
+
+      <div className="flex flex-col items-center justify-center lg:border rounded-[10px] m-4 p-6">
+        <br />
+        {isLoading || !blink ? (
+          <span>Loading</span>
+        ) : (
+          <div className="w-full max-w-lg">
+            <Blink
+              blink={blink}
+              adapter={adapter}
+              securityLevel="all"
+              stylePreset="x-dark"
+            />
+          </div>
+        )}
+      </div>
+    </main>
   );
 }
